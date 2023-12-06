@@ -17,6 +17,7 @@ recordRoutes.route("/record").get(async function (req, res) {
     try{
         const db_connect = await dbo.getDb("employees");
         const result = await db_connect.collection("records").find({}).toArray();
+        console.log("all the records");
         res.json(result);
     } catch (err) {
         throw err;
@@ -24,60 +25,66 @@ recordRoutes.route("/record").get(async function (req, res) {
 });
  
 // This section will help you get a single record by id
-recordRoutes.route("/record/:id").get(function (req, res) {
- let db_connect = dbo.getDb();
- let myquery = { _id: ObjectId(req.params.id) };
- db_connect
-   .collection("records")
-   .findOne(myquery, function (err, result) {
-     if (err) throw err;
-     res.json(result);
-   });
+recordRoutes.route("/record/:id").get(async function (req, res) {
+    try {
+        const db_connect = await dbo.getDb();
+        const myquery = { _id: ObjectId(req.params.id) };
+        const result = await db_connect.collection("records").findOne(myquery);
+        console.log("got record");
+        res.json(result);
+    } catch (err) {
+        throw err;
+    }
 });
  
 // This section will help you create a new record.
-recordRoutes.route("/record/add").post(function (req, response) {
- let db_connect = dbo.getDb();
- let myobj = {
-   name: req.body.name,
-   position: req.body.position,
-   level: req.body.level,
- };
- db_connect.collection("records").insertOne(myobj, function (err, res) {
-   if (err) throw err;
-   response.json(res);
- });
+recordRoutes.route("/record/add").post(async function (req, response) {
+    try {
+        const db_connect = await dbo.getDb();
+        const myobj = {
+        name: req.body.name,
+        position: req.body.position,
+        level: req.body.level,
+        };
+        const result = await db_connect.collection("records").insertOne(myobj);
+        console.log("created new record");
+        response.json(result);
+    } catch (err) {
+        throw err;
+    }
 });
  
 // This section will help you update a record by id.
-recordRoutes.route("/update/:id").post(function (req, response) {
- let db_connect = dbo.getDb();
- let myquery = { _id: ObjectId(req.params.id) };
- let newvalues = {
-   $set: {
-     name: req.body.name,
-     position: req.body.position,
-     level: req.body.level,
-   },
- };
- db_connect
-   .collection("records")
-   .updateOne(myquery, newvalues, function (err, res) {
-     if (err) throw err;
-     console.log("1 document updated");
-     response.json(res);
-   });
+recordRoutes.route("/update/:id").post(async function (req, response) {
+    try {
+        const db_connect = await dbo.getDb();
+        const myquery = { _id: ObjectId(req.params.id) };
+        const newvalues = {
+        $set: {
+            name: req.body.name,
+            position: req.body.position,
+            level: req.body.level,
+            },
+        };
+        const result = await db_connect.collection("records").updateOne(myquery, newvalues);
+        console.log("1 document updated");
+        response.json(result);
+    } catch (err) {
+        throw err;
+    }
 });
  
 // This section will help you delete a record
-recordRoutes.route("/:id").delete((req, response) => {
- let db_connect = dbo.getDb();
- let myquery = { _id: ObjectId(req.params.id) };
- db_connect.collection("records").deleteOne(myquery, function (err, obj) {
-   if (err) throw err;
-   console.log("1 document deleted");
-   response.json(obj);
- });
+recordRoutes.route("/:id").delete(async function (req, response) {
+    try {
+        const db_connect = await dbo.getDb();
+        const myquery = { _id: ObjectId(req.params.id) };
+        const result = await db_connect.collection("records").deleteOne(myquery);
+        console.log("1 document deleted");
+        response.json(obj);
+    } catch (err) {
+        throw err;
+    }
 });
  
 module.exports = recordRoutes;
